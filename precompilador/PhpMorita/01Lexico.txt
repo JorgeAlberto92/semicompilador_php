@@ -1,0 +1,14 @@
+<html>
+<head>
+<title>
+	holaMundo
+</title>
+</head>
+<body>
+	<?php
+		$var1=10;
+		$var2=100;
+		echo $var2;
+	?>
+</body>
+</html>

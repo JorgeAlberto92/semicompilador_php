@@ -1,0 +1,180 @@
+package Intermedio;
+import java_cup.runtime.Symbol;  
+import java.lang.System;
+import java.io.*;
+import Clases.*;
+import phpmorita.*;
+%%
+%public 
+%full
+%unicode
+%line
+%cup
+%char
+%eofval{
+	{ return Token(sym.EOF); }
+%eofval}
+
+%{
+	String tok = "";
+
+	private Symbol Token(int token, Object lexema) throws IOException {
+		int linea = yyline + 1;
+		tok = (String)lexema;
+		if (token != sym.EOF)
+			InformacionCodigo.guardarInformacionCodigo(linea,tok);
+		return new Symbol(token, lexema);
+	}
+
+	private Symbol Token(int token) throws IOException {
+		return Token(token, yytext());
+	}
+
+%}
+
+LineaNueva = (\n|\r)
+EspacioEnBlanco = ([\ |\t|\f])
+TerminoDeLinea = \r|\n|\r\n
+
+L = [a-zA-Z_]
+D = [0-9]
+STRING = {L}[A-Za-z0-9_]*
+INT = {D}+
+S = [/]
+P = [$]
+MEN = [<]
+MAY = [>]
+WHITE = [ \t\r\n]
+HTMLC = {MEN}({S}(html){MAY})
+HTMLA = {MEN}((html){MAY})
+HEADA = {MEN}((head){MAY})
+HEADC = {MEN}({S}(head){MAY})
+TITLEA = {MEN}((title){MAY})
+TITLEC = {MEN}({S}(title){MAY})
+BODYA = {MEN}((body){MAY})
+BODYC = {MEN}({S}(body){MAY})
+Comentario = [/*] [L][L]*[D]* [*/]
+variable = ({P}({L}[A-Za-z0-9_]*))
+
+%%
+/*ESPACIOS EN BLANCO*/
+[\n]            { yychar=0;}
+[ \t\r\n\f]     { /* Ignorar espacios en blanco. */ }
+{EspacioEnBlanco} { /* Aumenta la columna. */ yychar++;}
+{LineaNueva} {yychar=0; yyline=0}
+
+%%
+/* OPERADORES Y SIGNOS */
+
+"<"     {return Token(sym.MENQUE);}
+">"     {return Token(sym.MAYQUE);}
+"<="    {return Token(sym.MENIGU);}
+">="    {return Token(sym.MAYIGU);}
+"_"     {return Token(sym.GBAJO);}
+"'"     {return Token(sym.COMILLA);}
+";"     {return Token(sym.PCOMA);}
+","     {return Token(sym.COMA);}
+"{"     {return Token(sym.ABRIRLLA);}
+"}"     {return Token(sym.CERRARLLA);}
+"("     {return Token(sym.ABRIRPAR);}
+")"     {return Token(sym.CERRARPAR);}
+"+"     {return Token(sym.SUMA);}
+"-"     {return Token(sym.RESTA);}
+"*"     {return Token(sym.MULTIPLICACION);}
+"/"     {return Token(sym.SLASH);}
+"="     {return Token(sym.ASIGNACION);}
+"=="    {return Token(sym.IGUAL);}
+"!="    {return Token(sym.DIFERENTE);}
+"&="    {return Token(sym.ANDEQUAL);}
+"&&"    {return Token(sym.ANDBOOLEANO);}
+"||"    {return Token(sym.ORBOOLEANO);}
+"$"     {return Token(sym.DECLARA);}
+"!"     {return Token(sym.NOT);}
+"."     {return Token(sym.PUNTO);}
+
+/* PALABRAS RESERVADAS */
+"__halt_compiler();"    {return Token(sym.HALTCOM);}
+"abstract"              {return Token(sym.ABSTRACT);}
+"and"                   {return Token(sym.AND);}
+"array"                 {return Token(sym.ARRAY);}
+"as"                    {return Token(sym.AS);}
+"break"                 {return Token(sym.BREAK);}
+"callable"              {return Token(sym.CALLABLE);}
+"case"                  {return Token(sym.CASE);}
+"catch"                 {return Token(sym.CATCH);}
+"class"                 {return Token(sym.CLASS);}
+"clone"                 {return Token(sym.CLONE);}
+"const"                 {return Token(sym.CONST);}
+"continue"              {return Token(sym.CONTINUE);}
+"declare"               {return Token(sym.DECLARE);}
+"default"               {return Token(sym.DEFAULT);}
+"die"                   {return Token(sym.DIE);}
+"do"                    {return Token(sym.DO);}
+"echo"                  {return Token(sym.ECHO);}
+"else"                  {return Token(sym.ELSE);}
+"elseif"                {return Token(sym.ELSEIF);}
+"empty"                 {return Token(sym.EMPTY);}
+"enddeclare"            {return Token(sym.ENDDECLARE);}
+"endfor"                {return Token(sym.ENDFOR);}
+"endforeach"            {return Token(sym.ENDFOREACH);}
+"endif"                 {return Token(sym.ENDIF);}
+"endswitch"             {return Token(sym.ENDSWITCH);}
+"endwhile"              {return Token(sym.ENDWHILE);}
+"eval"                  {return Token(sym.EVAL);}
+"exit"                  {return Token(sym.EXIT);}
+"extends"               {return Token(sym.EXTENDS);}
+"final"                 {return Token(sym.FINAL);}
+"for"                   {return Token(sym.FOR);}
+"foreach"               {return Token(sym.FOREACH);}
+"function"              {return Token(sym.FUNCTION);}
+"global"                {return Token(sym.GLOBAL);}
+"goto"                  {return Token(sym.GOTO);}
+"if"                    {return Token(sym.IF);}
+"implements"            {return Token(sym.IMPLEMENTS);}
+"include"               {return Token(sym.INCLUDE);}
+"include_once"          {return Token(sym.INCLUDE_ONCE);}
+"instanceof"            {return Token(sym.INSTANCEOF);}
+"insteadof"             {return Token(sym.INSTEADOF);}
+"interface"             {return Token(sym.INTERFACE);}
+"isset"                 {return Token(sym.ISSET);}
+"list"                  {return Token(sym.LIST);}
+"or"                    {return Token(sym.OR);}
+"protected"             {return Token(sym.PROTECTED);}
+"public"                {return Token(sym.PUBLIC);}
+"require"               {return Token(sym.REQUIRE);}
+"require_once"          {return Token(sym.REQUIRE_ONCE);}
+"return"                {return Token(sym.RETURN);}
+"static"                {return Token(sym.STATIC);}
+"switch"                {return Token(sym.SWITCH);}
+"throw"                 {return Token(sym.THROW);}
+"trait"                 {return Token(sym.TRAIT);}
+"try"                   {return Token(sym.TRY);}
+"unset"                 {return Token(sym.UNSET);}
+"use"                   {return Token(sym.USE);}
+"var"                   {return Token(sym.VAR);}
+"while"                 {return Token(sym.WHILE);}
+"xor"                   {return Token(sym.XOR);}
+"yield"                 {return Token(sym.YIELD);}
+"print"               {return Token(sym.PRINT);}
+"<?php"                 {return Token(sym.ABRE_PHP);} 
+"?>"                    {return Token(sym.CIERRA_PHP);} 
+
+
+/* EXPRESIONES */
+{HTMLA}     {return Token(sym.ABRIR_HTML);}
+{HTMLC}     {return Token(sym.CIERRA_HTML);}
+{HEADA}     {return Token(sym.ABRE_HEAD);}
+{HEADC}     {return Token(sym.CIERRA_HEAD);} 
+{TITLEA}    {return Token(sym.ABRE_TITLE);}
+{TITLEC}    {return Token(sym.CIERRA_TITLE);} 
+{BODYA}     {return Token(sym.ABRE_BODY);} 
+{BODYC}     {return Token(sym.CIERRA_BODY);} 
+{STRING}    {return Token(sym.STRING, yytext());}
+{INT}       {return Token(sym.INT, yytext());}
+{variable}   {return Token(sym.VARIABLE, yytext());}
+
+. {
+    System.out.println("Error léxico en la fila " + yyline + " y en la columna " + yychar);
+    Interfaz.rotular("Error léxico: " + yytext() + " en la fila " + yyline + " y en la columna " + yychar);
+}
+

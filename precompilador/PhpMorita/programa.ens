@@ -1,0 +1,26 @@
+                                        MOVE #10 , /10001
+                                        MOVE /10001 , /10000
+                                        MOVE #100 , /10003
+                                        MOVE /10003 , /10002
+                                        MOVE /10002 , /10004
+                                        WRINT /10004
+BUCLE_1:                                NOP
+                                        MOVE /10000 , /10005
+                                        MOVE /10002 , /10006
+                                        CMP /10006 , /10005
+                                        BN $5
+                                        MOVE #0 , /10007
+                                        BR $3
+                                        MOVE #1 , /10007
+                                        CMP #0 , /10007
+                                        BZ /FINBUCLE_1
+                                        MOVE /10000 , /10009
+                                        MOVE #10 , /10010
+                                        MUL /10009 , /10010
+                                        MOVE .A , /10011
+                                        MOVE /10011 , /10008
+                                        MOVE /10008 , /10012
+                                        WRINT /10012
+                                        BR /BUCLE_1
+FINBUCLE_1:                             NOP
+                                        HALT

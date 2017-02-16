@@ -1,0 +1,547 @@
+package Intermedio;
+import java_cup.runtime.*;
+import java.util.*;
+import java.io.*;
+import javax.swing.*;
+import Clases.*;
+import phpmorita.*;
+
+action code {:
+
+	Tabla tabla;
+	int cuentaWhiles;
+	int cuentaDirecciones;
+	CodigoIntermedio codigoIntermedio;
+	int cuentaIf;
+	Pila pilaIf;
+	int cuentaBucle;
+	Pila pilaBucle;
+	int cuentaCadenas;
+	Lista listaCadenas;
+
+        void entre(){
+            JOptionPane.showMessageDialog(null, "Inicializando");
+        }
+
+	void inicializar() {
+		tabla = new Tabla();
+		cuentaWhiles = 0;
+		cuentaDirecciones = 9999;
+		cuentaIf = 0;
+		pilaIf = new Pila();
+		cuentaBucle = 0;
+		pilaBucle = new Pila();
+		cuentaCadenas = 0;
+		listaCadenas = new Lista();
+		String nombre = parser.nombreFichero.substring(0,parser.nombreFichero.lastIndexOf("."));
+		codigoIntermedio = new CodigoIntermedio(nombre + ".ci");
+		try {
+			codigoIntermedio.abrirFicheroEscritura();
+		} catch (IOException e) {
+			System.out.println(Textos.ficheroCiNoExiste);
+                        Interfaz.rotular(Textos.ficheroCiNoExiste);
+			codigoIntermedio.cerrarFicheroEscritura();
+		}
+	}
+
+	boolean existeSimbolo(String id) {
+		return tabla.existeSimbolo(id);
+	}
+
+	void addSimbolo(String id) {
+		tabla.addSimbolo(id);
+	}
+
+	void setDireccionSimbolo(String id,int dir) {
+		tabla.setDireccionSimbolo(id,dir);
+	}
+
+	Expresion suma(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("SUMAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion resta(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("RESTAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion producto(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("MULTIPLICAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion division(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("DIVIDIR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+
+
+	Expresion entero(String e) {
+		cuentaDirecciones++;
+		codigoIntermedio.guardarTripleta(new Tripleta("CARGAR_VALOR",
+								e,
+								null,
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion identificador(String id) {
+		cuentaDirecciones++;
+		codigoIntermedio.guardarTripleta(new Tripleta("CARGAR_DIRECCION",
+								String.valueOf((tabla.getSimbolo(id)).getDireccion()),
+								null,
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion or(Expresion c1,Expresion c2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("OR",
+								String.valueOf(c1.getDireccion()),
+								String.valueOf(c2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion and(Expresion c1,Expresion c2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("AND",
+								String.valueOf(c1.getDireccion()),
+								String.valueOf(c2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion mayor(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("MAYOR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion menor(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("MENOR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+        Expresion igual(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("IGUAL",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion distinto(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarTripleta(new Tripleta("DISTINTO",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	void asignacion(String id,Expresion e) {
+		codigoIntermedio.guardarTripleta(new Tripleta("CARGAR_DIRECCION",
+								String.valueOf(e.getDireccion()),
+								null,
+								String.valueOf((tabla.getSimbolo(id)).getDireccion())));
+	}
+
+	void cerrarCI() {
+		codigoIntermedio.cerrarFicheroEscritura();
+	}
+
+	void condicion(Expresion e,int n) {
+		codigoIntermedio.guardarTripleta(new Tripleta("SALTAR_CONDICION",
+					String.valueOf(e.getDireccion()),
+					null,
+					"ELSE_"+String.valueOf(n)));
+	}
+
+	void saltarEtiqueta(String eti,int n) {
+		codigoIntermedio.guardarTripleta(new Tripleta("SALTAR_ETIQUETA",
+					null,
+					null,
+					eti+"_"+String.valueOf(n)));
+	}
+
+	void ponerEtiqueta(String eti,int n) {
+		codigoIntermedio.guardarTripleta(new Tripleta("ETIQUETA",
+					null,
+					null,
+					eti+"_"+String.valueOf(n)));
+	}
+
+	void condicion2(Expresion e,int n) {
+		codigoIntermedio.guardarTripleta(new Tripleta("SALTAR_CONDICION",
+					String.valueOf(e.getDireccion()),
+					null,
+					"FINBUCLE_"+String.valueOf(n)));
+	}
+
+	void imprimirW(Expresion e) {
+		codigoIntermedio.guardarTripleta(new Tripleta("IMPRIMIR_ENTERO",
+					String.valueOf(e.getDireccion()),
+					null,
+					null));
+	}
+
+	void imprimirS(String c,int cuenta) {
+		listaCadenas.addCadena(c);
+		codigoIntermedio.guardarTripleta(new Tripleta("IMPRIMIR_CADENA",
+					"CADENA_"+String.valueOf(cuenta),
+					null,
+					null));
+	}
+
+	void generarCadenas() {
+		for(int i=0;i<listaCadenas.size();i++) {
+			codigoIntermedio.guardarTripleta(new Tripleta("PONER_CADENA",
+					"CADENA_"+String.valueOf(i+1),
+					null,
+					listaCadenas.getCadena(i)));
+		}
+	}
+
+	void generarCF() {
+		CodigoFinal codigoFinal = new CodigoFinal(codigoIntermedio,parser.nombreFichero);
+		try {
+			codigoFinal.traducirCodigo();
+		} catch(Exception e) {}
+	}
+
+	void finPrograma() {
+		codigoIntermedio.guardarTripleta(new Tripleta("FIN",null,null,null));
+	}
+
+:}
+
+parser code {:
+
+	static String nombreFichero;
+
+	//Inicia el parser
+
+        public void comenzar(String texto){
+            try {
+                Yylex lexico = new Yylex(new FileReader(texto));
+                nombreFichero = texto;
+                new parser(lexico).parse();
+            }
+            catch (Exception e) {
+                System.out.println("El fichero del programa no existe o no esta abierto");
+            }
+        }
+        
+	// Muestra el texto de un error
+	public void report_error(String message) {
+		System.err.println(message + "1");
+                Interfaz.rotular(message + "1");
+                try {
+                    this.parse();
+                } catch (Exception ex) {
+                    System.out.println("Error");
+                }
+	}
+
+	// Muestra un error de sintaxis
+	public void syntax_error(Symbol actual) {
+		if (actual.sym == sym.EOF){
+			Interfaz.rotular("Intruccion incompleta en linea : "+InformacionCodigo.linea+ " Token : "+InformacionCodigo.token);
+                }
+		else    {
+			Interfaz.rotular("Error sintactico en linea : "+InformacionCodigo.linea+ " Token : "+InformacionCodigo.token);
+                }
+        }
+
+
+	// Muestra el texto de un error irrecuperable
+	public void report_fatal_error(String message, Object info) {
+		System.err.println(message + "2");
+                Interfaz.rotular(message + "2");
+	}
+
+	// Muestra un mensaje cuando no se puede seguir analizando
+	public void unrecovered_syntax_error(Symbol actual) {
+	}
+
+	//Muestra un mensaje de error con linea, token y mensaje
+	public void error(String mensaje) {
+                report_error("ERROR -> Linea: "+InformacionCodigo.linea+" Lexema: "+InformacionCodigo.token+" "+mensaje);
+                try {
+                    this.parse();
+                } catch (Exception ex) {
+                    System.out.println("Error");
+                }
+	}
+:}
+
+//Terminales
+
+terminal    ABRIR_HTML, ABRE_HEAD, ABRE_TITLE, CIERRA_TITLE, CIERRA_HEAD, ABRE_BODY, ABRE_PHP, CIERRA_PHP, CIERRA_BODY, CIERRA_HTML;
+terminal    GBAJO, COMILLA, COMA, ANDEQUAL, DECLARA, NOT, DOSPUNTOS, INTERROGACION, AND, ARRAY, AS, CALLABLE, CASE, CATCH, CLONE, CONST, 
+            CONTINUE, DECLARE, DEFAULT, DIE, DO, ECHO, EMPTY, ENDDECLARE, ENDFOR, ENDFOREACH, ENDIF, ENDSWITCH, ENDWHILE, EVAL, EXIT, EXTENDS, 
+            FINAL, FOREACH, FUNCTION, GLOBAL, GOTO, IMPLEMENTS, INCLUDE, INCLUDE_ONCE, INSTANCEOF, INSTEADOF, INTERFACE, ISSET, LIST, OR, PROTECTED, PUBLIC, REQUIRE, REQUIRE_ONCE, 
+            RETURN, STATIC, SWITCH, THROW, TRAIT, TRY, UNSET, USE, VAR, XOR, YIELD, HALTCOM, ABSTRACT, CLASS, PRINT, PUNTO;
+terminal    ABRIRPAR, CERRARPAR, PCOMA, SUMA, RESTA, MULTIPLICACION, SLASH, MENQUE, MAYQUE, MENIGU, MAYIGU, IGUAL, DIFERENTE; 
+terminal    ORBOOLEANO, ANDBOOLEANO, ASIGNACION, ABRIRLLA, CERRARLLA, IF, ELSE, WHILE, ELSEIF, FOR; 
+terminal    BREAK;
+terminal    String STRING;
+terminal    String INT;
+terminal    String VARIABLE;
+
+// No terminales
+non terminal Programa, Instrucciones, Cuerpo;
+non terminal Instruccion;
+non terminal Declaracion;
+non terminal BloqueSentencias;
+non terminal Expresion Expresion;
+non terminal Expresion Condicion;
+non terminal SentIf, SentElse;
+non terminal SentWhile;
+non terminal SentAsignacion;
+non terminal SentEcho, SentPrint;
+non terminal SentBreak;
+
+//Precedencias de los operadores
+precedence left ASIGNACION;
+precedence left ORBOOLEANO, ANDBOOLEANO;
+precedence left IGUAL, DIFERENTE, MAYQUE, MENQUE;     
+precedence left SUMA, RESTA;
+precedence left MULTIPLICACION, SLASH;
+precedence left ABRIRPAR, CERRARPAR;
+precedence left ELSE;
+
+//Comienza con un no terminal
+
+start with Programa;
+
+//Aqui va la gramatica
+
+Programa ::=    {:
+                    inicializar();
+                :}
+                Cuerpo;
+
+Cuerpo ::= ABRIR_HTML ABRE_HEAD ABRE_TITLE STRING CIERRA_TITLE CIERRA_HEAD ABRE_BODY ABRE_PHP Instrucciones 
+                {: 
+                    finPrograma();
+                    generarCadenas();
+                    cerrarCI(); 
+                    generarCF();
+		:}
+                CIERRA_PHP CIERRA_BODY CIERRA_HTML;
+
+BloqueSentencias ::= Instrucciones |;
+
+Instrucciones ::= Instrucciones Instruccion | Instruccion;
+
+Expresion ::= Expresion:e1 SUMA Expresion:e2 
+			{:
+				RESULT=suma(e1,e2);
+			:}
+              |
+		  Expresion:e1 RESTA Expresion:e2 
+			{:
+				RESULT=resta(e1,e2);
+			:}
+		  |
+              Expresion:e1 MULTIPLICACION Expresion:e2 
+			{:
+				RESULT=producto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 SLASH Expresion:e2 
+			{:
+				RESULT=division(e1,e2);
+			:}
+		  |
+		  INT:e 
+			{:
+				RESULT=entero(e);
+			:}
+		  |
+		  VARIABLE:id 
+			{:  
+                                if(existeSimbolo(id)) {
+					RESULT=identificador(id);
+				} else {
+					parser.error(Textos.simboloNoDeclarado);
+					RESULT=identificador(null);
+				}
+			:}
+		  |
+	   	  ABRIRPAR Expresion:e CERRARPAR 
+			{:
+				RESULT=e;
+			:}
+		  ;
+
+Condicion ::= Condicion:c1 ORBOOLEANO Condicion:c2 
+			{:
+				RESULT=or(c1,c2);
+			:}
+	        |
+		  Condicion:c1 ANDBOOLEANO Condicion:c2 
+			{:
+				RESULT=and(c1,c2);
+			:}
+		  |
+      	  Expresion:e1 IGUAL Expresion:e2 
+			{:
+				RESULT=igual(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DIFERENTE Expresion:e2 
+			{:
+				RESULT=distinto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MAYQUE Expresion:e2 
+			{:
+				RESULT=mayor(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MENQUE Expresion:e2 
+			{:
+				RESULT=menor(e1,e2);
+			:}
+		  |
+                  ABRIRPAR Condicion:c CERRARPAR
+			{:
+				RESULT=c;
+			:}
+              ;
+
+SentIf ::= IF ABRIRPAR
+			{:
+				cuentaIf++;
+				pilaIf.apilar(cuentaIf);
+			:}
+           Condicion:c 
+			{:
+				condicion(c,pilaIf.verCima());
+			:}
+	     CERRARPAR ABRIRLLA BloqueSentencias CERRARLLA 
+			{:
+				saltarEtiqueta("FINIF",pilaIf.verCima());
+				ponerEtiqueta("ELSE",pilaIf.verCima());
+			:}
+	     SentElse
+			{:
+				ponerEtiqueta("FINIF",pilaIf.verCima());
+				pilaIf.desapilar();
+			:}
+           ;
+
+SentElse ::= ELSE ABRIRLLA BloqueSentencias CERRARLLA |;
+
+SentWhile ::= WHILE ABRIRPAR 
+			{:
+				cuentaBucle++;
+				pilaBucle.apilar(cuentaBucle);
+				ponerEtiqueta("BUCLE",pilaBucle.verCima());
+			:}
+		  Condicion:c
+			{:
+				condicion2(c,pilaBucle.verCima());
+			:} 
+		  CERRARPAR ABRIRLLA 
+			{:
+				cuentaWhiles++;
+			:}
+		  BloqueSentencias 
+			{:
+				cuentaWhiles--;
+			:}
+		  CERRARLLA
+			{:
+				saltarEtiqueta("BUCLE",pilaBucle.verCima());
+				ponerEtiqueta("FINBUCLE",pilaBucle.verCima());
+				pilaBucle.desapilar();
+			:}
+		  ;
+
+SentAsignacion ::= VARIABLE:id
+				{:
+					if(existeSimbolo(id)) {
+					parser.error(Textos.simboloRedeclarado);
+				} else {
+					addSimbolo(id);
+					cuentaDirecciones++;
+					setDireccionSimbolo(id,cuentaDirecciones);
+				}
+				:} 
+			 ASIGNACION Expresion:e PCOMA
+				{:
+					asignacion(id,e);
+				:}
+                   ;
+
+SentBreak ::= BREAK 
+			{:
+				if(cuentaWhiles>0) {
+				} else {
+					parser.error(Textos.breakSinWhile);
+				}
+			:}
+		  PCOMA;
+
+SentEcho ::= ECHO Expresion:e
+                                {:
+                                    imprimirW(e);
+                                :}
+             PCOMA
+             |
+             ECHO COMILLA STRING:c {:
+				cuentaCadenas++;
+				imprimirS(c,cuentaCadenas);
+			:}
+	       COMILLA PCOMA
+        ;
+
+SentPrint::= PRINT ABRIRPAR Expresion:e
+                                {:
+                                    imprimirW(e);
+                                :}
+             CERRARPAR PCOMA
+             |
+             PRINT ABRIRPAR COMILLA STRING:c {:
+				cuentaCadenas++;
+				imprimirS(c,cuentaCadenas);
+			:}
+	       COMILLA CERRARPAR PCOMA
+        ;
+
+Instruccion ::=   SentIf |
+		  SentWhile |
+		  SentAsignacion |
+                  SentEcho |
+                  SentPrint |
+		  SentBreak;
